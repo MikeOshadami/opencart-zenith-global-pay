@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name: Zenith GlobalPay OpenCart Payment Gateway
  * Plugin URI:  http://www.globalpay.com.ng
@@ -14,15 +15,22 @@ $_['text_edit'] = ' Edit GlobalPay Configuration';
 $_['text_payment'] = 'Payment';
 $_['text_success'] = 'Success: You have modified GlobalPay Merchant Details!!';
 $_['text_globalpay'] = '<img src="view/image/payment/globalpay-logo.png" alt="GTPay" title="GTPay" />';
+$_['text_test'] = 'Test';
+$_['text_live'] = 'Live';
 // Entry
 $_['entry_mercid'] = 'Merchant ID:';
+$_['entry_webservice_user'] = 'Webservice UserID:';
+$_['entry_webservice_password'] = 'Webservice Password:';
 $_['entry_debug'] = 'Debug Mode:<br/><span class="help">Logs additional information to the system log.</span>';
 $_['entry_pending_status'] = 'Pending Status:';
 $_['entry_processed_status'] = 'Completed Status:';
 $_['entry_geo_zone'] = 'Geo Zone:';
 $_['entry_status'] = 'Status:';
 $_['entry_sort_order'] = 'Sort Order:';
+$_['entry_test'] = 'Environment';
 // Error
 $_['error_permission'] = 'Warning: You do not have permission to modify GlobalPay Payment Settings!';
 $_['error_mercid'] = 'Merchant ID required!';
+$_['error_webservice_user'] = 'Webservice UserID required!';
+$_['error_webservice_password'] = 'Webservice Password required!';
 ?>

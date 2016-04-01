@@ -34,6 +34,41 @@
                             <?php } ?>
                         </div>
                     </div>
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-vendor"><?php echo $entry_webservice_user; ?></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="globalpay_webservice_user" value="<?php echo $globalpay_webservice_user; ?>" placeholder="<?php echo $globalpay_webservice_user; ?>" id="input-vendor" class="form-control" />
+                            <?php if ($error_webservice_user) { ?>
+                            <div class="text-danger"><?php echo $error_webservice_user; ?></div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-vendor"><?php echo $entry_webservice_password; ?></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="globalpay_webservice_password" value="<?php echo $globalpay_webservice_password; ?>" placeholder="<?php echo $globalpay_webservice_password; ?>" id="input-vendor" class="form-control" />
+                            <?php if ($error_webservice_password) { ?>
+                            <div class="text-danger"><?php echo $error_webservice_password; ?></div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-test"><?php echo $entry_test; ?></label>
+                        <div class="col-sm-10">
+                            <select name="globalpay_mode" id="input-test" class="form-control">
+                                <?php if ($remita_mode == 'test') { ?>
+                                <option value="test" selected="selected"><?php echo $text_test; ?></option>
+                                <?php } else { ?>
+                                <option value="test"><?php echo $text_test; ?></option>
+                                <?php } ?>
+                                <?php if ($remita_mode == 'live') { ?>
+                                <option value="live" selected="selected"><?php echo $text_live; ?></option>
+                                <?php } else { ?>
+                                <option value="live"><?php echo $text_live; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="input-order-status"><?php echo $entry_processed_status; ?></label>
                         <div class="col-sm-10">

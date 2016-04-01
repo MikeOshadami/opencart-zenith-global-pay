@@ -25,6 +25,7 @@ class ControllerPaymentGlobalpay extends Controller {
             $data['payerEmail'] = $order_info['email'];
             $data['payerPhone'] = html_entity_decode($order_info['telephone'], ENT_QUOTES, 'UTF-8');
             $data['customerId'] = $order_info['customer_id'];
+            $mode = trim($this->config->get('globalpay_mode'));
             $data['button_confirm'] = $this->language->get('button_confirm');
             $currencyCode = "NGN";
             $uniqueRef = uniqid();
@@ -37,15 +38,19 @@ class ControllerPaymentGlobalpay extends Controller {
                 'globalpay_cust_id' => $data['customerId'],
                 'names' => $data['payerName'],
                 'email_address' => $data['payerEmail'],
-                'phone_number' => $data['payerPhone'], 
+                'phone_number' => $data['payerPhone'],
                 'merch_txnref' => $globalpayorderid
             );
 
             foreach ($globalpay_args as $key => $value) {
                 $globalpay_args_array[] = "<input type='hidden' name='" . $key . "' value='" . $value . "'/>";
             }
+            if ($mode == 'test') {
+                $data['gateway_url'] = 'https://demo.globalpay.com.ng/globalpay_demo/Paymentgatewaycapture.aspx';
+            } else if ($mode == 'live') {
+                $data['gateway_url'] = 'https://www.globalpay.com.ng/Paymentgatewaycapture.aspx';
+            }
 
-            $data['gateway_url'] = 'https://demo.globalpay.com.ng/globalpay_demo/Paymentgatewaycapture.aspx';
             $data['globalpay_hidden_args'] = implode('', $globalpay_args_array);
         }
 
@@ -90,7 +95,7 @@ class ControllerPaymentGlobalpay extends Controller {
         $paymentId = $_POST["globalpay_tranx_id"];
         $transAmount = $_POST["globalpay_tranx_amt"];
         $order_id = $_POST["globalpay_echo_data"];
-        $response = $this->globalpay_transaction_details($transAmount, $paymentId);
+      //  $response = $this->globalpay_transaction_details($transAmount, $paymentId);
         $data['order_id'] = $order_id;
         $this->load->model('checkout/order');
         $order_info = $this->model_checkout_order->getOrder($order_id);
