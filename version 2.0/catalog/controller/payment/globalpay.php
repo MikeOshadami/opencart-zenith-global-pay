@@ -35,7 +35,6 @@ class ControllerPaymentGlobalpay extends Controller {
                 'merchantid' => $data['globalpay_mercid'],
                 'currency' => $currencyCode,
                 'amount' => $data['total'],
-                'globalpay_cust_id' => $data['customerId'],
                 'names' => $data['payerName'],
                 'email_address' => $data['payerEmail'],
                 'phone_number' => $data['payerPhone'],
@@ -64,27 +63,74 @@ class ControllerPaymentGlobalpay extends Controller {
         }
     }
 
-    function globalpay_transaction_details($amount, $transId) {
-        $merchantId = trim($this->config->get('globalpay_mercid'));
-        $hashkey = trim($this->config->get('globalpay_apikey'));
-        $hash_string = $merchantId . $transId . $hashkey;
-        $hash = hash('sha512', $hash_string);
-        $query_url = 'https://ibank.gtbank.com/GTPayService/gettransactionstatus.json?';
-        $url = $query_url . 'mertid=' . $merchantId . '&amount=' . $amount . '&tranxid=' . $transId . '&hash=' . $hash;
-        $result = file_get_contents($url);
-        $response = json_decode($result, true);
-        return $response;
+    function globalpay_transaction_details($txnref) {
+        $paymentInfo = array();
+        $mode = trim($this->config->get('globalpay_mode'));
+        if ($mode == 'test') {
+            $endpoint = 'https://demo.globalpay.com.ng/GlobalpayWebService_demo/service.asmx?wsdl';
+            $namespace = 'https://www.eazypaynigeria.com/globalpay_demo/';
+            $soap_action = 'https://www.eazypaynigeria.com/globalpay_demo/getTransactions';
+        } else if ($mode == 'live') {
+            $endpoint = 'https://www.globalpay.com.ng/globalpaywebservice/service.asmx?wsdl';
+            $namespace = 'https://www.eazypaynigeria.com/globalpay/';
+            $soap_action = 'https://www.eazypaynigeria.com/globalpay/getTransactions';
+        }
+        $soap_client = new nusoap_client($endpoint, TRUE);
+        if ($soap_client->getError()) {
+            $paymentInfo = FALSE;
+            return;
+        }
+
+        $params = array(
+            'merch_txnref' => $txnref,
+            'channel' => '',
+            'merchantID' => trim($this->config->get('globalpay_mercid')),
+            'start_date' => '',
+            'end_date' => '',
+            'uid' => trim($this->config->get('globalpay_webservice_user')),
+            'pwd' => trim($this->config->get('globalpay_webservice_password')),
+            'payment_status' => ''
+        );
+
+        $this->log->add($this->id, 'Connecting to GlobalPay at ' . $endpoint);
+
+        // Connect.
+        $result = $soap_client->call(
+                'getTransactions', array('parameters' => $params), $namespace, $soap_action, FALSE, TRUE
+        );
+
+        if ($soap_client->fault) {
+            $this->log->add($this->id, 'Error looking transaction\n' . print_r($result, TRUE));
+            $paymentInfo = FALSE;
+            return;
+        }
+
+        $err = $soap_client->getError();
+        if ($err) {
+            $this->log->add($this->id, 'Error looking transaction\n' . print_r($err, TRUE));
+            $paymentInfo = FALSE;
+            return;
+        }
+        $xml = simplexml_load_string($result['getTransactionsResult']);
+        $paymentInfo['amount'] = $xml->record->amount;
+        $paymentInfo['payment_date'] = $xml->record->payment_date;
+        $paymentInfo['channel'] = $xml->record->channel;
+        $paymentInfo['status'] = $xml->record->payment_status;
+        $paymentInfo['pmt_txnref'] = $xml->record->txnref;
+        $paymentInfo['currency'] = $xml->record->field_values->field_values->field[2]->currency;
+        $paymentInfo['description'] = $xml->record->payment_status_description;
+        return $paymentInfo;
     }
 
-    function updatePaymentStatus($order_id, $response_code, $response_reason, $transRef) {
-        switch ($response_code) {
-            case "00":
-                $message = 'Payment Status : - Successful - GTPay Transaction Reference: ' . $transRef;
+    function updatePaymentStatus($order_id, $status, $description, $pmt_txnref) {
+        switch ($status) {
+            case "successful":
+                $message = 'Payment Status : - Successful - GlobalPay Transaction Reference: ' . $pmt_txnref;
                 $this->model_checkout_order->addOrderHistory($order_id, trim($this->config->get('globalpay_processed_status_id')), $message, true);
                 break;
             default:
                 //process a failed transaction
-                $message = 'Payment Status : - Not Successful - Reason: ' . $response_reason . ' - GTPay Transaction Reference: ' . $transRef;
+                $message = 'Payment Status : - Not Successful - Reason: ' . $description . ' - GlobalPay Transaction Reference: ' . $pmt_txnref;
                 //1 - Pending Status
                 $this->model_checkout_order->addOrderHistory($order_id, 1, $message, true);
                 break;
@@ -92,17 +138,18 @@ class ControllerPaymentGlobalpay extends Controller {
     }
 
     public function callback() {
-        $paymentId = $_POST["globalpay_tranx_id"];
-        $transAmount = $_POST["globalpay_tranx_amt"];
-        $order_id = $_POST["globalpay_echo_data"];
-      //  $response = $this->globalpay_transaction_details($transAmount, $paymentId);
+        require_once 'lib/nusoap.php';
+        $txnref = $_GET["txnref"];
+        $response = $this->globalpay_transaction_details($txnref);
+        $order_details = explode('_', $txnref);
+        $order_id = $order_details[1];
         $data['order_id'] = $order_id;
         $this->load->model('checkout/order');
         $order_info = $this->model_checkout_order->getOrder($order_id);
-        $data['response_code'] = $response['ResponseCode'];
-        $data['transRef'] = $paymentId;
-        $data['response_reason'] = $response['ResponseDescription'];
-        $this->updatePaymentStatus($order_id, $data['response_code'], $data['response_reason'], $data['transRef']);
+        $data['status'] = $response['status'];
+        $data['pmt_txnref'] = $response['pmt_txnref'];
+        $data['description'] = $response['description'];
+        $this->updatePaymentStatus($order_id, $data['status'], $data['description'], $data['pmt_txnref']);
         if (isset($this->session->data['order_id'])) {
             $this->cart->clear();
             unset($this->session->data['shipping_method']);

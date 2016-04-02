@@ -35,7 +35,7 @@ class ControllerPaymentGlobalpay extends Controller {
         $data['text_test'] = $this->language->get('text_test');
         $data['text_live'] = $this->language->get('text_live');
         $data['text_edit'] = $this->language->get('text_edit');
-        $data['entry_mercid'] = $this->language->get('entry_mercid');
+        $data['entry_globalpay_mercid'] = $this->language->get('entry_globalpay_mercid');
         $data['entry_webservice_user'] = $this->language->get('entry_webservice_user');
         $data['entry_webservice_password'] = $this->language->get('entry_webservice_password');
         $data['entry_debug'] = $this->language->get('entry_debug');
@@ -55,9 +55,9 @@ class ControllerPaymentGlobalpay extends Controller {
         }
 
         if (isset($this->error['globalpay_mercid'])) {
-            $data['error_mercid'] = $this->error['globalpay_mercid'];
+            $data['error_globalpay_mercid'] = $this->error['globalpay_mercid'];
         } else {
-            $data['error_mercid'] = '';
+            $data['error_globalpay_mercid'] = '';
         }
         if (isset($this->error['globalpay_webservice_user'])) {
             $data['error_webservice_user'] = $this->error['globalpay_webservice_user'];
@@ -169,7 +169,7 @@ class ControllerPaymentGlobalpay extends Controller {
         }
 
         if (!$this->request->post['globalpay_mercid']) {
-            $this->error['globalpay_mercid'] = $this->language->get('error_mercid');
+            $this->error['globalpay_mercid'] = $this->language->get('error_globalpay_mercid');
         }
         if (!$this->request->post['globalpay_webservice_user']) {
             $this->error['globalpay_webservice_user'] = $this->language->get('error_webservice_user');

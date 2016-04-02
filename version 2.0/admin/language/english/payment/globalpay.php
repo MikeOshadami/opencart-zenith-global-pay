@@ -18,7 +18,7 @@ $_['text_globalpay'] = '<img src="view/image/payment/globalpay-logo.png" alt="GT
 $_['text_test'] = 'Test';
 $_['text_live'] = 'Live';
 // Entry
-$_['entry_mercid'] = 'Merchant ID:';
+$_['entry_globalpay_mercid'] = 'Merchant ID:';
 $_['entry_webservice_user'] = 'Webservice UserID:';
 $_['entry_webservice_password'] = 'Webservice Password:';
 $_['entry_debug'] = 'Debug Mode:<br/><span class="help">Logs additional information to the system log.</span>';
@@ -30,7 +30,7 @@ $_['entry_sort_order'] = 'Sort Order:';
 $_['entry_test'] = 'Environment';
 // Error
 $_['error_permission'] = 'Warning: You do not have permission to modify GlobalPay Payment Settings!';
-$_['error_mercid'] = 'Merchant ID required!';
+$_['error_globalpay_mercid'] = 'Merchant ID required!';
 $_['error_webservice_user'] = 'Webservice UserID required!';
 $_['error_webservice_password'] = 'Webservice Password required!';
 ?>

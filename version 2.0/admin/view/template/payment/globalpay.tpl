@@ -26,11 +26,11 @@
             <div class="panel-body">
                 <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form-globalpay" class="form-horizontal">
                     <div class="form-group required">
-                        <label class="col-sm-2 control-label" for="input-vendor"><?php echo $entry_mercid; ?></label>
+                        <label class="col-sm-2 control-label" for="input-vendor"><?php echo $entry_globalpay_mercid; ?></label>
                         <div class="col-sm-10">
                             <input type="text" name="globalpay_mercid" value="<?php echo $globalpay_mercid; ?>" placeholder="<?php echo $globalpay_mercid; ?>" id="input-vendor" class="form-control" />
-                            <?php if ($error_mercid) { ?>
-                            <div class="text-danger"><?php echo $error_mercid; ?></div>
+                            <?php if ($error_globalpay_mercid) { ?>
+                            <div class="text-danger"><?php echo $error_globalpay_mercid; ?></div>
                             <?php } ?>
                         </div>
                     </div>
@@ -56,12 +56,12 @@
                         <label class="col-sm-2 control-label" for="input-test"><?php echo $entry_test; ?></label>
                         <div class="col-sm-10">
                             <select name="globalpay_mode" id="input-test" class="form-control">
-                                <?php if ($remita_mode == 'test') { ?>
+                                <?php if ($globalpay_mode == 'test') { ?>
                                 <option value="test" selected="selected"><?php echo $text_test; ?></option>
                                 <?php } else { ?>
                                 <option value="test"><?php echo $text_test; ?></option>
                                 <?php } ?>
-                                <?php if ($remita_mode == 'live') { ?>
+                                <?php if ($globalpay_mode == 'live') { ?>
                                 <option value="live" selected="selected"><?php echo $text_live; ?></option>
                                 <?php } else { ?>
                                 <option value="live"><?php echo $text_live; ?></option>
